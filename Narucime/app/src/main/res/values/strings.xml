@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Naruci.me</string>
+    <string name="log">Log in</string>
+    <string name="appoint">My appointments:</string>
+    <string name="chooseAppoint">Choose how you want to make an appointment</string>
+    <string name="locationButton">Loaction</string>
+    <string name="manualButton">Manual</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="linkToLogIn">Already have an account?</string>
+    <string name="Login">LOGIN</string>
+    <string name="Registration">Registration</string>
+    <string name="linkToRegsitration">Don\'t have an account?</string>
+    <string name="saveMyAppointment">SAVE MY APPOINTMENT</string>
+    <string name="confirm">CONFIRM</string>
+</resources>

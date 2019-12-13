@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "25452364504",
+    "firebase_url": "https://narucimeproject.firebaseio.com",
+    "project_id": "narucimeproject",
+    "storage_bucket": "narucimeproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25452364504:android:1e5a0aa929e83000014dad",
+        "android_client_info": {
+          "package_name": "com.example.narucime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "25452364504-ei2p102cj1l3adesp4mfanhrf5rkcqdb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhCIKAaA6duxM7D_yRcI4wNE_dL0S-CV8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "25452364504-ei2p102cj1l3adesp4mfanhrf5rkcqdb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
