@@ -3,8 +3,8 @@
     <string name="log">Log in</string>
     <string name="appoint">My appointments:</string>
     <string name="chooseAppoint">Choose how you want to make an appointment</string>
-    <string name="locationButton">Loaction</string>
-    <string name="manualButton">Manual</string>
+    <string name="locationButton">Hospital location search</string>
+    <string name="manualButton">Hospital manual search</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
     <string name="email">Email</string>
@@ -14,4 +14,9 @@
     <string name="linkToRegsitration">Don\'t have an account?</string>
     <string name="saveMyAppointment">SAVE MY APPOINTMENT</string>
     <string name="confirm">CONFIRM</string>
+    <string name="title_activity_hospital_maps">Map</string>
+    <string name="date">Date:</string>
+    <string name="city">City:</string>
+    <string name="hospital">Hospital:</string>
+    <string name="examination">Examination:</string>
 </resources>

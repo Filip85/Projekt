@@ -6,7 +6,7 @@
     android:id="@+id/regitrationL"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    tools:context=".HomeActivity">
+    tools:context=".View.ui.HomeActivity">
 
     <TextView
         android:id="@+id/hospital"

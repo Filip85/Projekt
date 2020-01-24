@@ -1,8 +1,9 @@
 package com.example.narucime
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.narucime.View.ui.RegistrationActivity
 
 class MainActivity : AppCompatActivity() {
 

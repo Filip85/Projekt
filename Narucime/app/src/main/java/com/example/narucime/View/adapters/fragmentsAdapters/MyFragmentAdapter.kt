@@ -1,8 +1,10 @@
-package com.example.narucime
+package com.example.narucime.View.adapters.fragmentsAdapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.example.narucime.View.fragments.MakeAnAppointment
+import com.example.narucime.View.fragments.MyAppointments
 
 class MyFragmentAdapter(fragmentManager : FragmentManager) : FragmentPagerAdapter(fragmentManager) {
 

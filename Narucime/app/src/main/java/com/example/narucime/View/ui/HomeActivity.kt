@@ -1,4 +1,4 @@
-package com.example.narucime
+package com.example.narucime.View.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import com.example.narucime.View.adapters.fragmentsAdapters.MyFragmentAdapter
+import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -15,6 +17,7 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity() {
+    lateinit var path: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +31,10 @@ class HomeActivity : AppCompatActivity() {
     private fun setUpUi() {
         verifyUserIsLoggedIn()
 
-        viewPager.adapter = MyFragmentAdapter(supportFragmentManager)
+        viewPager.adapter =
+            MyFragmentAdapter(
+                supportFragmentManager
+            )
         tabLayout.setupWithViewPager(viewPager)
     }
 
@@ -43,8 +49,6 @@ class HomeActivity : AppCompatActivity() {
         }
         else{
             val uid = FirebaseAuth.getInstance().currentUser!!.uid
-
-
 
             //val pref = FirebaseDatabase.getInstance().getReference("username/") //String::class.java
             val ref = FirebaseDatabase.getInstance().getReference("users/${uid}/username")

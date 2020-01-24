@@ -1,4 +1,4 @@
-package com.example.narucime
+package com.example.narucime.View.adapters.recyclerviewAdapters
 
 import android.content.Intent
 import android.util.Log
@@ -7,14 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.narucime.Model.City
+import com.example.narucime.MyApplication
+import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
+import com.example.narucime.View.ui.HospitalsActivity
 import kotlinx.android.synthetic.main.item_city.view.*
 
 class CityAdapter(val cities: MutableList<City>): RecyclerView.Adapter<CityHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityHolder {
         val cityView = LayoutInflater.from(parent.context).inflate(R.layout.item_city, parent, false)
-        val cityHolder = CityHolder(cityView)
+        val cityHolder =
+            CityHolder(cityView)
         return cityHolder
     }
 
@@ -36,6 +40,8 @@ class CityHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         itemView.setOnClickListener {
             //val pos = adapterPosition
+            Log.d("nekiGrad", city.toString())
+
 
             val intent = Intent(MyApplication.ApplicationContext, HospitalsActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
