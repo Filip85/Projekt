@@ -1,7 +1,7 @@
 package com.example.narucime.View.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.narucime.Model.DataClass
 import com.example.narucime.R
@@ -23,6 +23,7 @@ class HospitalsActivity : AppCompatActivity() {
     }
 
     private fun setUpUi() {
+        this.title = "Hospitals"
 
         getDataFromFirebase()
     }

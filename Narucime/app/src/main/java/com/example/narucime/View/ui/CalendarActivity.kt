@@ -12,20 +12,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.narucime.Context.MyApplication
 import com.example.narucime.Model.DataClass
-import com.example.narucime.Model.UserAppointment
-import com.example.narucime.MyApplication
-import com.example.narucime.NotificationPublisher
 import com.example.narucime.SharedPreferences.MyPreference
+import com.example.narucime.View.Notification.NotificationPublisher
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.activity_calendar.*
+import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random
+
+
 
 
 class CalendarActivity : AppCompatActivity() {
@@ -53,6 +52,8 @@ class CalendarActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(com.example.narucime.R.layout.activity_calendar)
 
+        this.title = "Appointment"
+
         val calInstance = Calendar.getInstance()
         val y = calInstance.get(Calendar.YEAR)
         val m = calInstance.get(Calendar.MONTH)
@@ -68,6 +69,10 @@ class CalendarActivity : AppCompatActivity() {
         datePickerButton.setOnClickListener{
             setUpUi(calInstance, y, m, d)
         }
+
+        confirmButton.setOnClickListener {
+            Toast.makeText(this,"Please, pick your date", Toast.LENGTH_LONG).show()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -79,14 +84,21 @@ class CalendarActivity : AppCompatActivity() {
         val examination = intent?.getStringExtra(
             EXAMINATION ?: "nothing recieved")
 
+        confirmButton.setOnClickListener(null)
+
         date.clear()
 
         val month = m + 1
 
         currentDate = "$d-$month-$y"
 
+        val currentMonth = m
+
         Log.d("CalendarActivity", currentDate)
 
+        val currentDatee = LocalDate.now()
+
+        Log.d("koji mjesec", currentDatee.month.toString())
 
         datePicker = DatePickerDialog.newInstance(
             {view, year, monthOfYear, dayOfMounth ->
@@ -98,8 +110,11 @@ class CalendarActivity : AppCompatActivity() {
                 pickedDate1 = "$dayOfMounth/$pickedMonth/$year"
 
 
-                if(dayOfMounth > 15 && monthOfYear == m) {
-                    Toast.makeText(this, "You can't make an appointment for this mounth. Please, make the appointemt for next month.", Toast.LENGTH_LONG).show()
+                if(dayOfMounth > 15 && d > 15 && monthOfYear == currentMonth) {
+                    Toast.makeText(this, "You can't make an appointment for this mounth. Please, make the appointmet for the next month.", Toast.LENGTH_LONG).show()
+                }
+                else if(dayOfMounth <= 15 && d <= 15 && monthOfYear == currentMonth) {
+                    Toast.makeText(this, "You can't make an appointment for a first half of a mounth. Please, make the appointmet for the second half of the mounth.", Toast.LENGTH_LONG).show()
                 }
                 else {
                     cityTextView.text = city.toString()
@@ -112,7 +127,9 @@ class CalendarActivity : AppCompatActivity() {
                     }
                 }
             }, y, m, d
-        )
+        ).also {
+            it.minDate = Calendar.getInstance()
+        }
 
         blockDates(currentDate, datePicker)
 
@@ -173,59 +190,36 @@ class CalendarActivity : AppCompatActivity() {
 
         val uid = FirebaseAuth.getInstance().currentUser
         val userUid = uid?.uid
+        val path2 = "cities/$city/$hospital"
 
+        Log.d("Gdjesenarucujem", path2)
         val ref = FirebaseDatabase.getInstance().getReference("cities/$city/$hospital")
 
-        ref.addValueEventListener(object : ValueEventListener{
-            override fun onCancelled(p0: DatabaseError) {
-                Toast.makeText(MyApplication.ApplicationContext, "Error occurred. Please, try again later.", Toast.LENGTH_LONG).show()
-            }
+        path = "users/$userUid/username"
+        path1 = "cities/$city/$hospital/$examination/${pickedDate}/$userUid"
+        val data = DataClass()
 
-            override fun onDataChange(p0: DataSnapshot) {
-                val pref = MyPreference(this@CalendarActivity)
-                val username = pref.getUsername()
-                var temp = false
-                for (h in p0.children) {
-                    for (n in h.children) {
-                        for (s in n.children) {
-                            val numOfApp = s.getValue(UserAppointment::class.java)
-                            //Log.d("Filip", numOfApp?.date)
-                            if (numOfApp?.date == pickedDate1 && numOfApp?.username == username) {
-                                temp = true
-                                Log.d("Filip1", temp.toString())
-                            }
-                        }
-                    }
-                }
+        data.saveAppointmentToFirebase(path, path1, pickedDate, pickedDate1, city!!, position!!, hospital!!, examination!!, userUid!!)
 
-                if (temp == false) {
+        val content = "${city}, ${hospital}, ${examination}, ${pickedDate1}"
 
-                    path = "users/$userUid/username"
-                    path1 = "cities/$city/$hospital/$examination/${pickedDate}/$userUid"
-                    val data = DataClass()
+        scheduleNotifaction(hospital ,content)
 
-                    data.saveAppointmentToFirebase(path, path1, pickedDate, pickedDate1, city!!, position!!, hospital!!, examination!!, userUid!!)
-
-                    scheduleNotifaction(hospital ,pickedDate1)
-
-                    val intent = Intent(this@CalendarActivity, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                }
-            }
-        })
+        val intent = Intent(MyApplication.ApplicationContext, HomeActivity::class.java)
+        //intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 
     private fun scheduleNotifaction(title: String, content: String) {
-        val randomId = Random.nextInt(1, 100)
+        val randomId = Random.nextInt(1, 10000)
         val notificationIntent = Intent(this, NotificationPublisher::class.java)
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, randomId)
-        notificationIntent.putExtra(NotificationPublisher.NOTIFICATON_TITLE, title)
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATON_TITLE, "You have an appintment.")
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_CONTENT, content)
 
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            set(Calendar.DAY_OF_YEAR, 12)
+            set(Calendar.DAY_OF_YEAR, 20)
             set(Calendar.MONTH, 0)
             set(Calendar.YEAR, 2020)
             set(Calendar.HOUR_OF_DAY, 16)
@@ -241,11 +235,12 @@ class CalendarActivity : AppCompatActivity() {
 
         Log.d("MyTime", System.currentTimeMillis().toString())
 
-        val time = calendar.timeInMillis - System.currentTimeMillis()
+        val time =  calendar.timeInMillis - System.currentTimeMillis() /*- calendar.timeInMillis*/
 
         val futureInMillis = SystemClock.elapsedRealtime() + time
         Log.d("TimeMy", futureInMillis.toString())
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent)
     }
+
 }

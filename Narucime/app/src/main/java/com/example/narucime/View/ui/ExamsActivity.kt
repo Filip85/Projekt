@@ -29,6 +29,7 @@ class ExamsActivity : AppCompatActivity() {
     }
 
     private fun setUpUi() {
+        this.title = "Examinations"
 
         getDataFromFirebase()
 
@@ -43,6 +44,7 @@ class ExamsActivity : AppCompatActivity() {
 
         Log.d("NekiGrad", cityName!!)
         path  = "cities//${cityName}/${hospitalName}"
+        Log.d("PathIsMy", path)
 
         val data = DataClass()
         data.getExamesFromFirebase(examsRecyclerView as RecyclerView, path, cityName, hospitalName!!)

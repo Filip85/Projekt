@@ -1,4 +1,4 @@
-package com.example.narucime
+package com.example.narucime.View.Notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +9,8 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.narucime.Context.MyApplication
+import com.example.narucime.R
 
 class NotificationPublisher : BroadcastReceiver() {
     companion object {
@@ -21,10 +23,16 @@ class NotificationPublisher : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("Hoj", "Bok ja sam filip")
+        val n_ID = intent.getStringExtra(
+            NotificationPublisher.NOTIFICATION_ID ?: "nothing recieved")
+        val n_TITLE = intent.getStringExtra(
+            NotificationPublisher.NOTIFICATON_TITLE ?: "nothing recieved")
+        val n_CONTENT = intent.getStringExtra(
+            NotificationPublisher.NOTIFICATION_CONTENT ?: "nothing recieved")
 
         val id = intent.getIntExtra(NOTIFICATION_ID, 0)
-        val title = intent.getIntExtra(NOTIFICATON_TITLE, 0)
-        val content = intent.getIntExtra(NOTIFICATION_CONTENT, 0)
+        val title = intent.getStringExtra(NOTIFICATON_TITLE)
+        val content = intent.getStringExtra(NOTIFICATION_CONTENT)
 
         val channelId = "Channel+${id}"
 
@@ -39,9 +47,9 @@ class NotificationPublisher : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(MyApplication.ApplicationContext, channelId)
-            .setContentTitle("Bok")
-            .setContentText("Ja sam Filip")
-            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+            .setContentTitle(n_TITLE)
+            .setContentText(n_CONTENT)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(MyApplication.ApplicationContext)) {

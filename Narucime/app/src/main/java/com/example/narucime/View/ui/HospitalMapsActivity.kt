@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.narucime.Model.City
@@ -32,9 +33,11 @@ import kotlinx.android.synthetic.main.activity_hospital_maps.*
 class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     override fun onMarkerClick(p0: Marker?): Boolean {
         Log.d("WhereIAm", city.cityName)
+        val pref = MyPreference(this)
+        Log.d("WhereIAm", pref.getHospitalName()!!)
         val intent = Intent(this, ExamsActivity::class.java)
         intent.putExtra(ExamsActivity.CITYNAMEE, city.cityName)
-        intent.putExtra(ExamsActivity.HOSPITALNAME, "KBC Rebro")
+        intent.putExtra(ExamsActivity.HOSPITALNAME, pref.getHospitalName())
         startActivity(intent)
         return true
     }
@@ -62,12 +65,19 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
     }
 
     private fun init() {
+
         inputSearch.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_DONE
                 || actionId == EditorInfo.IME_ACTION_SEARCH
                 || event.action == KeyEvent.ACTION_DOWN
                 || event.action == KeyEvent.KEYCODE_ENTER) {
-                geoLocate()
+
+                if(inputSearch.text.toString() == "") {
+                    Toast.makeText(this, "Please, enter Address, City or Zip Code", Toast.LENGTH_LONG).show()
+                }
+                else {
+                    geoLocate()
+                }
                 true
             } else {
                 false
@@ -134,6 +144,8 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
 
     private fun placeMarkerOnMap(location: LatLng) {
 
+        map.clear()
+
         val markerOptions = MarkerOptions().position(location)
 
         val titleStr = getAddress(location)
@@ -165,15 +177,19 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
             val pref = MyPreference(this)
 
             dataClass.getHospotalName(path, add.get(0), object : FetchHospitalsName {
-                override fun getHospitalName(hospitalName: String) {
-                    pref.setHospitalName(hospitalName)
+                override fun getHospitalName(hospitalName: String?) {
+                    Log.d("HospitalnameHMActivity", hospitalName)
+                    pref.setHospitalName(hospitalName!!)
+                    //hospital = Hospital(hospitalName, add.get(0))
                 }
-
             })
 
-            hospital = Hospital(pref.getHospitalName()!!, add.get(0))
-            Log.d("NameH", hospital.hositalName)
+            //hospital = Hospital(pref.getHospitalName()!!, add.get(0))
+            //Log.d("NameH", hospital.hositalName)
         }
+
+        Log.d("adresaneka", addressText)
         return addressText
     }
+
 }

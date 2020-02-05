@@ -2,7 +2,7 @@ package com.example.narucime.Model
 
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.MyApplication
+import com.example.narucime.Context.MyApplication
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.RecyclerViewClass
 import com.example.narucime.View.adapters.recyclerviewAdapters.AppointemnetAdapter
@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter
 class DataClass {
     lateinit var listOfUserAppointment: MutableList<UserAppointment>
     lateinit var list: MutableList<String>
+    lateinit var cityList: MutableList<String>
 
     fun getData(recyclerView: RecyclerView, path: String) {
 
@@ -34,6 +35,7 @@ class DataClass {
                 val userName = pref.getUsername()
 
                 listOfUserAppointment = mutableListOf()
+                cityList = mutableListOf()
 
                 val date: LocalDate = LocalDate.now()
 
@@ -52,6 +54,8 @@ class DataClass {
 
                                     if (user!!.username == userName && todaysDate.isBefore(appointmentDate)) {
                                         listOfUserAppointment.add(user)
+                                        cityList.add(c.key.toString())
+                                        Log.d("Kojigrad", c.key.toString())
                                     }
                                     Log.d("dsds1", user!!.username.toString())
                                 }
@@ -60,7 +64,8 @@ class DataClass {
                             val recycler = RecyclerViewClass()
                             val adapter: RecyclerView.Adapter<*> =
                                 AppointemnetAdapter(
-                                    listOfUserAppointment
+                                    listOfUserAppointment,
+                                    cityList
                                 )
                             recycler.createRecyclerView(recyclerView, adapter)
                         }
@@ -156,11 +161,12 @@ class DataClass {
 
             override fun onDataChange(p0: DataSnapshot) {
                 list = mutableListOf()
-                list.clear()
+                //list.clear()
                 for (h in p0.children) {
                     val numOfApp = h.childrenCount.toString()
                     for (n in h.children) {
                         Log.d("key123", n.childrenCount.toString())
+
                         val username = n.getValue(UserAppointment::class.java)
 
                         if (username?.date != null) {
@@ -208,6 +214,8 @@ class DataClass {
                         "CalendarActivity",
                         "cities/$city/$hospital/$position/$examination/$userUid"
                     )
+
+                    return@addOnSuccessListener
                 }
                     .addOnFailureListener {
                         Log.d("CalendarActivity", "Error")
@@ -223,6 +231,8 @@ class DataClass {
 
         val ref = FirebaseDatabase.getInstance().getReference(path)
 
+        //Log.d("Kojijetopath", address)
+
         ref.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -232,12 +242,39 @@ class DataClass {
                 for(h in p0.children) {
                     val hospital = h.getValue(Hospital::class.java)
 
+
+
                     if(address == hospital!!.address) {
-                        fetchHospitalsName.getHospitalName(hospital.hositalName)
-                        Log.d("DataClass", hospital.address)
+                        Log.d("Kojijetopath", hospital!!.address)
+                        fetchHospitalsName.getHospitalName(h.key)
+                        Log.d("DataClassH", h.key!!)
                     }
                 }
             }
+        })
+    }
+
+    fun deleteAppointemnt(path: String, date: String, examination: String, user: String, hospital: String) {
+        val ref = FirebaseDatabase.getInstance().getReference(path)
+        Log.d("Kojibrisem", path)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                for(d in p0.children) {
+                    val appointemnt = d.getValue(UserAppointment::class.java)
+
+                    if(date == appointemnt!!.date && examination == appointemnt.examination && user == appointemnt.username && hospital == appointemnt.hospital) {
+                        ref.removeValue()
+                        Log.d("Kojibrisem", date)
+                        return
+                    }
+                }
+            }
+
         })
     }
 }

@@ -1,4 +1,4 @@
-package com.example.narucime
+package com.example.narucime.Context
 
 import android.app.Application
 import android.content.Context

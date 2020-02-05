@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.MyApplication
+import com.example.narucime.Context.MyApplication
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.ui.ExamsActivity
@@ -42,7 +42,7 @@ class HospitalHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
             val intent = Intent(MyApplication.ApplicationContext, ExamsActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(ExamsActivity.HOSPITALNAME, hospital)
-            intent.putExtra(ExamsActivity.CITYNAMEE, "Zagreb")
+            intent.putExtra(ExamsActivity.CITYNAMEE, cityname)
 
             MyApplication.ApplicationContext.startActivity(intent)
         }

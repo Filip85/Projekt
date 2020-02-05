@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.narucime.Model.City
-import com.example.narucime.MyApplication
+import com.example.narucime.Context.MyApplication
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.ui.HospitalsActivity
@@ -40,7 +40,7 @@ class CityHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         itemView.setOnClickListener {
             //val pos = adapterPosition
-            Log.d("nekiGrad", city.toString())
+            Log.d("nekiGrad", city.cityName.toString())
 
 
             val intent = Intent(MyApplication.ApplicationContext, HospitalsActivity::class.java)

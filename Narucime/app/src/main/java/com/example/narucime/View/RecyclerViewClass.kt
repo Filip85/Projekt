@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.MyApplication
+import com.example.narucime.Context.MyApplication
 
 class RecyclerViewClass {
 

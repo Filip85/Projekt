@@ -1,14 +1,14 @@
 package com.example.narucime.View.ui
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import com.example.narucime.View.adapters.fragmentsAdapters.MyFragmentAdapter
+import androidx.appcompat.app.AppCompatActivity
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
+import com.example.narucime.View.adapters.fragmentsAdapters.MyFragmentAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

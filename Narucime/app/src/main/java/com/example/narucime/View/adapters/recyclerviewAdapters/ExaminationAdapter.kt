@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.MyApplication
+import com.example.narucime.Context.MyApplication
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.ui.CalendarActivity
