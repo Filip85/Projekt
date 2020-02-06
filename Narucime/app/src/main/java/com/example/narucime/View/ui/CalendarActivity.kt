@@ -14,10 +14,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.narucime.Context.MyApplication
 import com.example.narucime.Model.DataClass
+import com.example.narucime.Notification.NotificationPublisher
 import com.example.narucime.SharedPreferences.MyPreference
-import com.example.narucime.View.Notification.NotificationPublisher
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.activity_calendar.*
 import java.time.LocalDate
@@ -123,7 +122,7 @@ class CalendarActivity : AppCompatActivity() {
                     dateTextView.text = pickedDate1
                     confirmTextView.text = "Please, press CONFIRM button to confirm your appointment!"
                     confirmButton.setOnClickListener{
-                        saveAppointement(pickedDate, pickedDate1)
+                        saveAppointement(pickedDate, pickedDate1, dayOfMounth, monthOfYear, year)
                     }
                 }
             }, y, m, d
@@ -177,7 +176,7 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun saveAppointement(pickedDate: String, pickedDate1: String) {
+    private fun saveAppointement(pickedDate: String, pickedDate1: String, day: Int, monthDay: Int, year: Int) {
         val position = intent?.getStringExtra(
             POSITION ?: "nothing recieved")
         val city = intent?.getStringExtra(
@@ -193,7 +192,7 @@ class CalendarActivity : AppCompatActivity() {
         val path2 = "cities/$city/$hospital"
 
         Log.d("Gdjesenarucujem", path2)
-        val ref = FirebaseDatabase.getInstance().getReference("cities/$city/$hospital")
+        //val ref = FirebaseDatabase.getInstance().getReference("cities/$city/$hospital")
 
         path = "users/$userUid/username"
         path1 = "cities/$city/$hospital/$examination/${pickedDate}/$userUid"
@@ -203,28 +202,34 @@ class CalendarActivity : AppCompatActivity() {
 
         val content = "${city}, ${hospital}, ${examination}, ${pickedDate1}"
 
-        scheduleNotifaction(hospital ,content)
+        scheduleNotifaction(hospital ,content, day, monthDay, year)
 
         val intent = Intent(MyApplication.ApplicationContext, HomeActivity::class.java)
         //intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+
     }
 
-    private fun scheduleNotifaction(title: String, content: String) {
+    private fun scheduleNotifaction(title: String, content: String, day: Int, month: Int, year: Int) {
         val randomId = Random.nextInt(1, 10000)
         val notificationIntent = Intent(this, NotificationPublisher::class.java)
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, randomId)
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATON_TITLE, "You have an appintment.")
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_CONTENT, content)
 
+
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            set(Calendar.DAY_OF_YEAR, 20)
-            set(Calendar.MONTH, 0)
-            set(Calendar.YEAR, 2020)
-            set(Calendar.HOUR_OF_DAY, 16)
-            set(Calendar.MINUTE, 3)
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, day - 2)
+            set(Calendar.HOUR_OF_DAY, 15)
+            set(Calendar.MINUTE, 15)
         }
+
+        /*val oneDay=AlarmManager.INTERVAL_DAY;//Converts 24 Hrs(1 Day) to milliseconds
+        val noOfDays = 2
+        val reminderTime=calendar.timeInMillis-(noOfDays*oneDay)*/
 
         val pendingIntent = PendingIntent.getBroadcast(
             this,
@@ -235,12 +240,12 @@ class CalendarActivity : AppCompatActivity() {
 
         Log.d("MyTime", System.currentTimeMillis().toString())
 
-        val time =  calendar.timeInMillis - System.currentTimeMillis() /*- calendar.timeInMillis*/
+        val time =  /*System.currentTimeMillis() -*/ calendar.timeInMillis
 
-        val futureInMillis = SystemClock.elapsedRealtime() + time
-        Log.d("TimeMy", futureInMillis.toString())
+        val futureInMillis = SystemClock.elapsedRealtime() - time
+        Log.d("TimeMy", calendar.timeInMillis.toString())
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent)
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, time, pendingIntent)
     }
 
 }

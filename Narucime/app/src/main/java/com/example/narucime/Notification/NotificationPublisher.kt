@@ -1,4 +1,4 @@
-package com.example.narucime.View.Notification
+package com.example.narucime.Notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -38,7 +38,7 @@ class NotificationPublisher : BroadcastReceiver() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, "Notification", importance).apply {
+            val channel = NotificationChannel(channelId, "Notificationnn", importance).apply {
                 description = "Hi, I am notificaton!"
             }
 
