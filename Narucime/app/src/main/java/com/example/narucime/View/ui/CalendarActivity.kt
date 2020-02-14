@@ -13,7 +13,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.narucime.Context.MyApplication
-import com.example.narucime.Model.DataClass
+import com.example.narucime.FirebaseSource.DataClass
 import com.example.narucime.Notification.NotificationPublisher
 import com.example.narucime.SharedPreferences.MyPreference
 import com.google.firebase.auth.FirebaseAuth
@@ -223,29 +223,25 @@ class CalendarActivity : AppCompatActivity() {
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month)
             set(Calendar.DAY_OF_MONTH, day - 2)
-            set(Calendar.HOUR_OF_DAY, 15)
-            set(Calendar.MINUTE, 15)
+            set(Calendar.HOUR_OF_DAY, 12)
+            set(Calendar.MINUTE, 38)
+            set(Calendar.SECOND, 30)
         }
-
-        /*val oneDay=AlarmManager.INTERVAL_DAY;//Converts 24 Hrs(1 Day) to milliseconds
-        val noOfDays = 2
-        val reminderTime=calendar.timeInMillis-(noOfDays*oneDay)*/
 
         val pendingIntent = PendingIntent.getBroadcast(
             this,
-            randomId,
+            randomId,                         //staviti id datum npr 2232020  22/3/2020
             notificationIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         Log.d("MyTime", System.currentTimeMillis().toString())
 
-        val time =  /*System.currentTimeMillis() -*/ calendar.timeInMillis
+        val time =  calendar.timeInMillis - System.currentTimeMillis()
 
-        val futureInMillis = SystemClock.elapsedRealtime() - time
-        Log.d("TimeMy", calendar.timeInMillis.toString())
+        Log.d("TimeMy", time.toString())
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, time, pendingIntent)
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time, pendingIntent)
     }
 
 }

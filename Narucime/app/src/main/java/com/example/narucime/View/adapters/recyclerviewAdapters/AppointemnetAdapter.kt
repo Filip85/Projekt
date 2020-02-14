@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.Model.DataClass
-import com.example.narucime.Model.UserAppointment
 import com.example.narucime.Context.MyApplication
+import com.example.narucime.FirebaseSource.DataClass
+import com.example.narucime.Model.UserAppointment
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.cancel_appointment_dialog.*
 import kotlinx.android.synthetic.main.item_appointment.view.*
 
@@ -59,8 +60,10 @@ class AppointmentHolder(itemView: View, context: Context): RecyclerView.ViewHold
 
         dialog.setContentView(com.example.narucime.R.layout.cancel_appointment_dialog)
 
+        val fireabse = FirebaseAuth.getInstance().currentUser
+
         itemView.setOnClickListener{
-            val path = "cities/$city/${appointment.hospital}/${appointment.examination}/${newDateFormat}"
+            val path = "cities/$city/${appointment.hospital}/${appointment.examination}/${newDateFormat}/${fireabse!!.uid}"
             dialog.show()
             dialog.confirm_button.setOnClickListener{
                 val data = DataClass()

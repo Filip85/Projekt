@@ -13,7 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.narucime.Model.City
-import com.example.narucime.Model.DataClass
+import com.example.narucime.FirebaseSource.DataClass
 import com.example.narucime.Model.Hospital
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference

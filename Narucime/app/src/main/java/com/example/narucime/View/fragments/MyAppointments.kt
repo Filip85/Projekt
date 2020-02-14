@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.Model.DataClass
+import com.example.narucime.FirebaseSource.DataClass
 import com.example.narucime.Model.UserAppointment
 import com.example.narucime.R
 import kotlinx.android.synthetic.main.my_appointments.*

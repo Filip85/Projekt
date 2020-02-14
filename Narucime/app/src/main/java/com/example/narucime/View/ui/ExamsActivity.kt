@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.Model.DataClass
+import com.example.narucime.FirebaseSource.DataClass
 import com.example.narucime.R
 import kotlinx.android.synthetic.main.activity_exams.*
 
