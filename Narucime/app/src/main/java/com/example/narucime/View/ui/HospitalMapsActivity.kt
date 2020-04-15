@@ -12,11 +12,12 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.example.narucime.Model.City
 import com.example.narucime.FirebaseSource.DataClass
+import com.example.narucime.Model.City
 import com.example.narucime.Model.Hospital
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
+import com.example.narucime.View.listeners.FetchAllHospitals
 import com.example.narucime.View.listeners.FetchHospitalsName
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_hospital_maps.*
+import kotlin.math.absoluteValue
 
 
 class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -76,7 +78,7 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
                     Toast.makeText(this, "Please, enter Address, City or Zip Code", Toast.LENGTH_LONG).show()
                 }
                 else {
-                    geoLocate()
+                    //geoLocate()
                 }
                 true
             } else {
@@ -85,18 +87,59 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         }
     }
 
-    private fun geoLocate() {
+    private fun geoLocate(hospitalName: MutableList<String>, currentLatLin: LatLng) {
         val serchString = inputSearch.text.toString()
 
         val geocoder = Geocoder(this)
-        val addresses: List<Address>?
-        val address: Address?
+        var addresses: List<Address>?
+        var address: Address?
+        var long = 0.0
+        var lat = 0.0
+        var initLong = 0.0
+        var initLat = 0.0
+        var hName = "null"
 
-        addresses = geocoder.getFromLocationName(serchString, 1)
+        addresses = geocoder.getFromLocationName(hospitalName[1], 1)
 
         if(addresses.size > 0) {
             address = addresses.get(0)
 
+            initLong = address.longitude - currentLatLin.longitude
+            initLat = address.latitude - currentLatLin.latitude
+        }
+
+        for(h in hospitalName) {
+            addresses = geocoder.getFromLocationName(h, 1)
+
+            if(addresses.size > 0) {
+                address = addresses.get(0)
+
+                long = address.longitude - currentLatLin.longitude
+                lat = address.latitude - currentLatLin.latitude
+
+                if(long.absoluteValue < initLong.absoluteValue && lat.absoluteValue < initLat.absoluteValue) {
+                    initLong = address.longitude
+                    initLat = address.latitude
+                    hName = h
+                }
+            }
+        }
+
+        val hospitalLatLng = LatLng(initLat, initLong)
+
+        placeMarkerOnMap(hospitalLatLng, hName)
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(hospitalLatLng, 12f))
+
+        //Log.d("WhereIAm", address.toString())
+        Log.d("WhereIAm", hospitalLatLng.toString())
+
+        /*if(addresses.size > 0) {
+            address = addresses.get(0)
+
+            if((currentLatLin.latitude >= address.latitude) && (currentLatLin.longitude >= address.longitude)) {
+                long = address.longitude
+                lat = address.latitude
+            }
             val hospitalLatLng = LatLng(address.latitude, address.longitude)
 
             placeMarkerOnMap(hospitalLatLng)
@@ -105,7 +148,7 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
             Log.d("WhereIAm", address.toString())
             Log.d("WhereIAm", hospitalLatLng.toString())
 
-        }
+        }*/
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -138,22 +181,41 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
                 //placeMarkerOnMap(currentLatLng)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 Log.d("WhereIAm", currentLatLng.toString())
+
+                find_hospital.setOnClickListener{
+                    findNearestHospital(currentLatLng)
+                }
             }
         }
     }
 
-    private fun placeMarkerOnMap(location: LatLng) {
+    private fun findNearestHospital(currentLatLin: LatLng) {
+        val dataClass = DataClass()
+        path = "cities/"
+
+        dataClass.getAllHospitals(path, object : FetchAllHospitals{
+            override fun getHospotals(listOfHospitals: MutableList<String>) {
+                geoLocate(listOfHospitals, currentLatLin)
+            }
+        })
+    }
+
+    private fun placeMarkerOnMap(location: LatLng, hospitalName: String) {
 
         map.clear()
 
-        val markerOptions = MarkerOptions().position(location)
+        //val markerOptions = MarkerOptions().position(location)
 
-        val titleStr = getAddress(location)
+        val titleStr = hospitalName + ", " + getAddress(location)
 
         Log.d("WhereIAm", titleStr)
-        markerOptions.title(titleStr)
+        //markerOptions.title(titleStr)
 
-        map.addMarker(markerOptions)
+        //map.addMarker(markerOptions)
+
+        map.addMarker(MarkerOptions()
+            .position(LatLng(location.latitude, location.longitude))
+            .title(titleStr)).showInfoWindow()
     }
 
     private fun getAddress(latLng: LatLng): String {

@@ -8,21 +8,28 @@ import com.example.narucime.Model.UserAppointment
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.RecyclerViewClass
 import com.example.narucime.View.adapters.recyclerviewAdapters.AppointemnetAdapter
+import com.example.narucime.View.adapters.recyclerviewAdapters.CityAdapter
 import com.example.narucime.View.adapters.recyclerviewAdapters.ExaminationAdapter
 import com.example.narucime.View.adapters.recyclerviewAdapters.HospitalAdapter
+import com.example.narucime.View.listeners.FetchAllHospitals
 import com.example.narucime.View.listeners.FetchHospitalsName
+import com.example.narucime.View.listeners.FetchMaxTimes
 import com.example.narucime.View.listeners.OnGetDataListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class DataClass {
     lateinit var listOfUserAppointment: MutableList<UserAppointment>
     lateinit var list: MutableList<String>
     lateinit var cityList: MutableList<String>
+    lateinit var dates: MutableList<String>
+    lateinit var listOfHospital: MutableList<String>
+    lateinit var listOfTimes: MutableList<String>
 
     fun getData(recyclerView: RecyclerView, path: String) {
 
@@ -59,21 +66,69 @@ class DataClass {
                                         cityList.add(c.key.toString())
                                         Log.d("Kojigrad", c.key.toString())
                                     }
-                                    Log.d("dsds1", user!!.username.toString())
                                 }
                             }
 
-                            val recycler = RecyclerViewClass()
+                            val l = LocalDate.parse("14/2/2018", DateTimeFormatter.ofPattern("d/M/yyyy"))
+
+                            /*listOfUserAppointment.sortBy{
+                                LocalDate.parse(it.date, DateTimeFormatter.ofPattern("d/M/yyyy"))
+                            }*/
+
+
+                            Log.d("stojeovosada", l.toString())
+
+                            /*val recycler = RecyclerViewClass()
                             val adapter: RecyclerView.Adapter<*> =
                                 AppointemnetAdapter(
                                     listOfUserAppointment,
                                     cityList
                                 )
-                            recycler.createRecyclerView(recyclerView, adapter)
+                            recycler.createRecyclerView(recyclerView, adapter)*/
                         }
                     }
                 }
+
+                listOfUserAppointment.sortBy{
+                    LocalDate.parse(it.date, DateTimeFormatter.ofPattern("d/M/yyyy"))
+                }
+
+                val recycler = RecyclerViewClass()
+                val adapter: RecyclerView.Adapter<*> =
+                    AppointemnetAdapter(
+                        listOfUserAppointment,
+                        cityList
+                    )
+                recycler.createRecyclerView(recyclerView, adapter)
             }
+        })
+    }
+
+    fun getCitiesFormFirebase(recyclerView: RecyclerView, path: String){
+        val ref = FirebaseDatabase.getInstance().getReference(path)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                cityList = mutableListOf()
+
+                for(c in p0.children) {
+                    cityList.add(c.key.toString())
+                }
+
+                cityList.sortBy{ it }
+
+                val recycler = RecyclerViewClass()
+                val adapter: RecyclerView.Adapter<*> =
+                    CityAdapter(
+                        cityList
+                    )
+                recycler.createRecyclerView(recyclerView, adapter)
+            }
+
         })
     }
 
@@ -205,15 +260,40 @@ class DataClass {
 
                 Log.d("date", pickedDate)
 
-
                 val ref = FirebaseDatabase.getInstance()
                     .getReference("cities/$city/$hospital/$examination/${pickedDate}/$userUid")
+                val TimeRef = "cities/$city/$hospital/$examination/${pickedDate}"
 
-                val userAppointemnt = UserAppointment(
+                getTime(TimeRef, object : FetchMaxTimes {
+                    override fun getMaxTime(maxTime: String) {
+                        val userAppointemnt = UserAppointment(
+                            username1!!,
+                            pickedDate1,
+                            hospital!!,
+                            examination!!,
+                            maxTime
+                        )
+                        ref.setValue(userAppointemnt).addOnSuccessListener {
+                            Log.d("CalendarActivity", "Ok")
+                            Log.d(
+                                "CalendarActivity",
+                                "cities/$city/$hospital/$position/$examination/$userUid"
+                            )
+
+                            return@addOnSuccessListener
+                        }
+                            .addOnFailureListener {
+                                Log.d("CalendarActivity", "Error")
+                            }
+                    }
+
+                })
+                /*val userAppointemnt = UserAppointment(
                     username1!!,
                     pickedDate1,
                     hospital!!,
-                    examination!!
+                    examination!!,
+                    20.toString()
                 )
                 ref.setValue(userAppointemnt).addOnSuccessListener {
                     Log.d("CalendarActivity", "Ok")
@@ -226,8 +306,43 @@ class DataClass {
                 }
                     .addOnFailureListener {
                         Log.d("CalendarActivity", "Error")
-                    }
+                    }*/
 
+                }
+        })
+    }
+
+    fun getTime(ref: String, fetchMaxTimes: FetchMaxTimes) {
+        val pref = MyPreference(MyApplication.ApplicationContext)
+        val ref = FirebaseDatabase.getInstance().getReference(ref)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                listOfTimes = mutableListOf()
+                for(i in p0.children) {
+                    val time = i.getValue(UserAppointment::class.java)
+
+                    listOfTimes.add(time!!.time)
+
+                    Log.d("TimeMyTime", time!!.time.toString())
+                }
+
+                val maxTime = listOfTimes.max()
+
+                if(listOfTimes.isEmpty()) {
+                    val newTime = "07:00"
+                    fetchMaxTimes.getMaxTime(newTime)
+                }
+                else {
+
+                    val newTime = LocalTime.parse(maxTime)
+                    Log.d("TimeMyTime1", newTime.plusMinutes(30).toString())
+                    fetchMaxTimes.getMaxTime(newTime.plusMinutes(30).toString())
+                }
             }
 
         })
@@ -249,8 +364,6 @@ class DataClass {
                 for(h in p0.children) {
                     val hospital = h.getValue(Hospital::class.java)
 
-
-
                     if(address == hospital!!.address) {
                         Log.d("Kojijetopath", hospital!!.address)
                         fetchHospitalsName.getHospitalName(h.key)
@@ -258,6 +371,27 @@ class DataClass {
                     }
                 }
             }
+        })
+    }
+
+    fun getAllHospitals(path: String, fetchAllHospitals: FetchAllHospitals) {
+        val ref = FirebaseDatabase.getInstance().getReference(path)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                listOfHospital = mutableListOf()
+                for(c in p0.children) {
+                    for(h in c.children) {
+                        listOfHospital.add(h.key!!)
+                    }
+                }
+                fetchAllHospitals.getHospotals(listOfHospital)
+            }
+
         })
     }
 

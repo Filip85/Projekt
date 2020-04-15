@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.narucime.Model.City
 import com.example.narucime.Context.MyApplication
 import com.example.narucime.R
 import com.example.narucime.SharedPreferences.MyPreference
 import com.example.narucime.View.ui.HospitalsActivity
 import kotlinx.android.synthetic.main.item_city.view.*
 
-class CityAdapter(val cities: MutableList<City>): RecyclerView.Adapter<CityHolder>() {
+class CityAdapter(val cities: MutableList<String>): RecyclerView.Adapter<CityHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityHolder {
         val cityView = LayoutInflater.from(parent.context).inflate(R.layout.item_city, parent, false)
@@ -35,20 +34,20 @@ class CityAdapter(val cities: MutableList<City>): RecyclerView.Adapter<CityHolde
 }
 
 class CityHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-    fun bind(city: City) {
-        itemView.city.text = city.cityName
+    fun bind(city: String) {
+        itemView.city.text = city
 
         itemView.setOnClickListener {
             //val pos = adapterPosition
-            Log.d("nekiGrad", city.cityName.toString())
+            Log.d("nekiGrad", city.toString())
 
 
             val intent = Intent(MyApplication.ApplicationContext, HospitalsActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.putExtra(HospitalsActivity.CITYNAME, city.cityName)
+            intent.putExtra(HospitalsActivity.CITYNAME, city)
 
             val myPreference = MyPreference(MyApplication.ApplicationContext)
-            myPreference.setCityName(city.cityName)
+            myPreference.setCityName(city)
 
             MyApplication.ApplicationContext.startActivity(intent)
         }

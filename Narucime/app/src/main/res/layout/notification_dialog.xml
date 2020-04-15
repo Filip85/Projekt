@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:text="Do you agree to get notifications 1, 3, and 7 days prior to the appointment date. If yes, press AGREE, if not, you can press CANCEL. If you want to set up notifications press SET UP NOTIFICATIONS."/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/confirm_button"
+            android:text="Agree"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/set_up_notifications"
+            android:text="SET UP NOTIFICATIONS"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cancel_button"
+            android:text="Cancel"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

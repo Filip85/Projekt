@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.narucime.Context.MyApplication
 import com.example.narucime.R
+import kotlin.random.Random
 
 class NotificationPublisher : BroadcastReceiver() {
     companion object {
@@ -34,11 +35,15 @@ class NotificationPublisher : BroadcastReceiver() {
         val title = intent.getStringExtra(NOTIFICATON_TITLE)
         val content = intent.getStringExtra(NOTIFICATION_CONTENT)
 
-        val channelId = "Channel+${id}"
+        val randomId = Random.nextInt(1, 10000)
+
+        val channelId = "Channel${id}"
+
+        Log.d("chanelID", n_ID.toString())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, "Notificationnn", importance).apply {
+            val channel = NotificationChannel(randomId.toString(), "Notificationnn${randomId}", importance).apply {
                 description = "Hi, I am notificaton!"
             }
 
@@ -53,7 +58,7 @@ class NotificationPublisher : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(MyApplication.ApplicationContext)) {
-            notify(id, builder.build())
+            notify(randomId, builder.build())
         }
 
     }

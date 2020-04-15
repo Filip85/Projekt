@@ -49,6 +49,7 @@ class AppointmentHolder(itemView: View, context: Context): RecyclerView.ViewHold
         itemView.cityApp.text = appointment.hospital
         itemView.timeApp.text = appointment.examination
         itemView.hospitalApp.text = appointment.date
+        itemView.time.text = appointment.time
 
         val spliter = appointment.date.split("/")
 
@@ -74,7 +75,6 @@ class AppointmentHolder(itemView: View, context: Context): RecyclerView.ViewHold
             dialog.quite_button.setOnClickListener{
                 dialog.dismiss()
             }
-            //Toast.makeText(MyApplication.ApplicationContext,"dsdsdsds", Toast.LENGTH_LONG).show()
         }
     }
 }

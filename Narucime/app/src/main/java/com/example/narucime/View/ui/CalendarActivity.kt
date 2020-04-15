@@ -1,6 +1,7 @@
 package com.example.narucime.View.ui
 
 import android.app.AlarmManager
+import android.app.Dialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -12,13 +13,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.narucime.Context.MyApplication
 import com.example.narucime.FirebaseSource.DataClass
 import com.example.narucime.Notification.NotificationPublisher
 import com.example.narucime.SharedPreferences.MyPreference
 import com.google.firebase.auth.FirebaseAuth
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.activity_calendar.*
+import kotlinx.android.synthetic.main.notification_dialog.*
+import kotlinx.android.synthetic.main.notification_dialog.confirm_button
+import kotlinx.android.synthetic.main.set_up_notification_dialog.*
+import java.lang.Double.parseDouble
 import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random
@@ -37,6 +41,13 @@ class CalendarActivity : AppCompatActivity() {
     lateinit var pickedDate1: String
     lateinit var path: String
     lateinit var path1: String
+    lateinit var dialog: Dialog
+    var firstNumber = 0
+    var secondNumber = 0
+    var thirdNumber = 0
+    var num1: Double = 0.0
+    var num2: Double = 0.0
+    var num3: Double = 0.0
 
     companion object {
         const val POSITION = "position"
@@ -202,31 +213,131 @@ class CalendarActivity : AppCompatActivity() {
 
         val content = "${city}, ${hospital}, ${examination}, ${pickedDate1}"
 
-        scheduleNotifaction(hospital ,content, day, monthDay, year)
 
-        val intent = Intent(MyApplication.ApplicationContext, HomeActivity::class.java)
-        //intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+        notificationDialog(hospital, content, day, monthDay, year)
 
     }
 
-    private fun scheduleNotifaction(title: String, content: String, day: Int, month: Int, year: Int) {
-        val randomId = Random.nextInt(1, 10000)
+    private fun notificationDialog(hospital: String, content: String, day: Int, monthDay: Int, year: Int) {
+
+        val dialog = Dialog(this)
+        dialog.setContentView(com.example.narucime.R.layout.notification_dialog)
+        dialog.show()
+
+        dialog.cancel_button.setOnClickListener {
+            dialog.cancel()
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
+
+        dialog.confirm_button.setOnClickListener {
+            scheduleNotifaction(hospital ,content, day, monthDay, year, 1, 3, 7)
+            dialog.cancel()
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
+
+        dialog.set_up_notifications.setOnClickListener {
+            dialog.cancel()
+            val dialog = Dialog(this)
+            dialog.setContentView(com.example.narucime.R.layout.set_up_notification_dialog)
+            dialog.show()
+
+            dialog.confirm_button.setOnClickListener {
+                firstNumber = dialog.first_number.text.toString().toInt()
+                secondNumber = dialog.second_number.text.toString().toInt()
+                thirdNumber = dialog.third_number.text.toString().toInt()
+
+                Log.d("Firtnumberuno", secondNumber.toString())
+                var numeric = true
+
+
+                try {
+                    num1 = parseDouble(firstNumber.toString())
+                    num2 = parseDouble(secondNumber.toString())
+                    num3 = parseDouble(thirdNumber.toString())
+                } catch (e: NumberFormatException) {
+                    numeric = false
+                }
+
+                scheduleNotifaction(hospital ,content, day, monthDay, year, num1.toInt(), num2.toInt(), num3.toInt())
+                dialog.cancel()
+
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+
+                /*if(numeric == false) {
+                    Toast.makeText(this, "Please, enter numeric value!", Toast.LENGTH_LONG).show()
+                }
+                else {
+                    scheduleNotifaction(hospital ,content, day, monthDay, year, num1.toInt(), num2.toInt(), num3.toInt())
+                    dialog.cancel()
+                }*/
+            }
+
+            dialog.go_back.setOnClickListener {
+                dialog.cancel()
+                notificationDialog(hospital ,content, day, monthDay, year)
+            }
+        }
+    }
+
+    private fun scheduleNotifaction(hospital: String, content: String, day: Int, month: Int, year: Int, firstNumber: Int, secondNumber: Int, thirdNumber: Int) {
+        val notificationIntent1 = intentFuncton(content)
+        val notificationIntent2 = intentFuncton(content)
+        val notificationIntent3 = intentFuncton(content)
+
+        val calendar1 = calendarFunction(day - firstNumber, month, year)
+        val calendar2 = calendarFunction(day - secondNumber, month, year)
+        val calendar3 = calendarFunction(day - thirdNumber, month, year)
+
+        val pendingIntent1 = createPendingIntent(notificationIntent1)
+        val pendingIntent2 = createPendingIntent(notificationIntent2)
+        val pendingIntent3 = createPendingIntent(notificationIntent3)
+
+        Log.d("MyTime", System.currentTimeMillis().toString())
+
+        val time =  calendar1.timeInMillis - System.currentTimeMillis()
+        val time2 =  calendar2.timeInMillis - System.currentTimeMillis()
+        val time3 =  calendar3.timeInMillis - System.currentTimeMillis()
+
+        Log.d("TimeMy", time.toString())
+
+        alarmFunction(time, pendingIntent1)
+        alarmFunction(time2, pendingIntent2)
+        alarmFunction(time3, pendingIntent3)
+    }
+
+    private fun intentFuncton(content: String): Intent {
         val notificationIntent = Intent(this, NotificationPublisher::class.java)
-        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, randomId)
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATON_TITLE, "You have an appintment.")
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_CONTENT, content)
 
+        return notificationIntent
 
+    }
+
+    private fun calendarFunction(day: Int, month: Int, year: Int): Calendar {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month)
-            set(Calendar.DAY_OF_MONTH, day - 2)
+            set(Calendar.DAY_OF_MONTH, day)
             set(Calendar.HOUR_OF_DAY, 12)
             set(Calendar.MINUTE, 38)
             set(Calendar.SECOND, 30)
         }
+
+        return calendar
+    }
+
+    private fun alarmFunction(time: Long, pendingIntent: PendingIntent){
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time, pendingIntent)
+    }
+
+    private fun createPendingIntent(notificationIntent: Intent): PendingIntent{
+        val randomId = Random.nextInt(1, 10000)
 
         val pendingIntent = PendingIntent.getBroadcast(
             this,
@@ -235,13 +346,7 @@ class CalendarActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        Log.d("MyTime", System.currentTimeMillis().toString())
-
-        val time =  calendar.timeInMillis - System.currentTimeMillis()
-
-        Log.d("TimeMy", time.toString())
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time, pendingIntent)
+        return pendingIntent
     }
 
 }
