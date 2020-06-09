@@ -95,6 +95,8 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         var address: Address?
         var long = 0.0
         var lat = 0.0
+        var plong = 0.0
+        var plat = 0.0
         var initLong = 0.0
         var initLat = 0.0
         var hName = "null"
@@ -106,21 +108,34 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
 
             initLong = address.longitude - currentLatLin.longitude
             initLat = address.latitude - currentLatLin.latitude
+            plong = initLong
+            plat = initLat
+
+            Log.d("WhereIAm", address.longitude.toString())
+            Log.d("WhereIAm", address.latitude.toString())
         }
 
         for(h in hospitalName) {
             addresses = geocoder.getFromLocationName(h, 1)
 
-            if(addresses.size > 0) {
+            if (addresses.size > 0) {
                 address = addresses.get(0)
+                Log.d("WhereIAm", address.longitude.toString())
+                Log.d("WhereIAm", address.latitude.toString())
 
                 long = address.longitude - currentLatLin.longitude
                 lat = address.latitude - currentLatLin.latitude
 
-                if(long.absoluteValue < initLong.absoluteValue && lat.absoluteValue < initLat.absoluteValue) {
+                Log.d("WhereIAmm", initLat.toString())
+                Log.d("WhereIAmm", initLong.toString())
+
+                if (long.absoluteValue <= plong.absoluteValue && lat.absoluteValue <= plat.absoluteValue) {
                     initLong = address.longitude
                     initLat = address.latitude
+                    plong = long
+                    plat = lat
                     hName = h
+                    //Log.d("WhereIAmm", initLong.toString())
                 }
             }
         }
@@ -130,8 +145,7 @@ class HospitalMapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         placeMarkerOnMap(hospitalLatLng, hName)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(hospitalLatLng, 12f))
 
-        //Log.d("WhereIAm", address.toString())
-        Log.d("WhereIAm", hospitalLatLng.toString())
+        //Log.d("WhereIAm", hospitalLatLng.toString())
 
         /*if(addresses.size > 0) {
             address = addresses.get(0)
